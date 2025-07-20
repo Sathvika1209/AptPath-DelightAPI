@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CakeViewSet, RegisterView, LoginView, LogoutView, UserView
+from .views import CakeViewSet, RegisterView, LoginView, LogoutView, UserView, DeleteAccountView, ChangePasswordView, UpdateProfileView
 from django.http import HttpResponse
 
 router = DefaultRouter()
@@ -16,5 +16,10 @@ urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='login'),
     path('auth/logout/', LogoutView.as_view(), name='logout'),
     path('auth/user/', UserView.as_view(), name='user'),
+    path('auth/delete/', DeleteAccountView.as_view(), name='delete_account'),
+    path('auth/change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('auth/update/', UpdateProfileView.as_view(), name='update-profile'),
+
+
 ]
 

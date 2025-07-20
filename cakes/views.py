@@ -56,7 +56,48 @@ class UserView(APIView):
             'username': user.username,
             'email': user.email,
         })
+    
+class DeleteAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response({'message': 'Account deleted successfully'}, status=204)
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        current_password = request.data.get("current_password")
+        new_password = request.data.get("new_password")
+
+        if not user.check_password(current_password):
+            return Response({"error": "Incorrect current password"}, status=400)
+
+        user.set_password(new_password)
+        user.save()
+        return Response({"message": "Password changed successfully"})
+
+class UpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        username = request.data.get("username")
+        email = request.data.get("email")
+
+        if username:
+            user.username = username
+        if email:
+            user.email = email
+
+        user.save()
+        return Response({"message": "Profile updated successfully"})
+
 
 class CakeViewSet(viewsets.ModelViewSet):
     queryset = Cake.objects.all()
     serializer_class = CakeSerializer
+    permission_classes = [IsAuthenticated]

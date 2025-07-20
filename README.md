@@ -4,7 +4,9 @@
 ![DRF](https://img.shields.io/badge/DRF-3.14-orange)
 ![Swagger](https://img.shields.io/badge/Swagger-Enabled-brightgreen)
 
-A Django REST API for managing cakes and user authentication.
+DelightAPI is a RESTful backend service designed to support a cake delivery platform. It handles user authentication, cake listings, and administrative operations to streamline online cake ordering and management.
+
+
 
 ---
 

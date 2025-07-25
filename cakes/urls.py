@@ -1,10 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CakeViewSet, RegisterView, LoginView, LogoutView, UserView, DeleteAccountView, ChangePasswordView, UpdateProfileView
+from .views import CakeViewSet, StoreViewSet, RegisterView, LoginView, LogoutView, UserView, DeleteAccountView, ChangePasswordView, UpdateProfileView
 from django.http import HttpResponse
 
 router = DefaultRouter()
 router.register(r'cakes', CakeViewSet)
+router.register(r'stores', StoreViewSet)
 
 def index(request):
     return HttpResponse("Welcome to DelightAPI")

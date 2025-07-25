@@ -8,6 +8,8 @@ from django.contrib.auth import authenticate
 from rest_framework import viewsets
 from .models import Cake
 from .serializers import CakeSerializer
+from .models import Store
+from .serializers import StoreSerializer
 
 
 class RegisterView(APIView):
@@ -101,3 +103,7 @@ class CakeViewSet(viewsets.ModelViewSet):
     queryset = Cake.objects.all()
     serializer_class = CakeSerializer
     permission_classes = [IsAuthenticated]
+
+class StoreViewSet(viewsets.ModelViewSet):
+    queryset = Store.objects.all()
+    serializer_class = StoreSerializer

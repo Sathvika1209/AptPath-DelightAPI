@@ -78,8 +78,12 @@ WSGI_APPLICATION = 'delightapi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'delightdb',
+        'USER': 'postgre',
+        'PASSWORD': 'Sathvika1864',   # replace with your actual PostgreSQL password
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

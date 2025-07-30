@@ -138,9 +138,43 @@ Here's a quick summary of key endpoints (full details in Swagger):
 
 ---
 
-## 💡 Notes
+🎂 Cake API
+| Method | Endpoint           | Description              | Auth Required |
+| ------ | ------------------ | ------------------------ | ------------- |
+| GET    | `/api/cakes/`      | List all cakes           | ✅ Yes         |
+| POST   | `/api/cakes/`      | Add a new cake           | ✅ Yes         |
+| GET    | `/api/cakes/<id>/` | Retrieve a specific cake | ✅ Yes         |
+| PUT    | `/api/cakes/<id>/` | Update a cake            | ✅ Yes         |
+| DELETE | `/api/cakes/<id>/` | Delete a cake            | ✅ Yes         |
+
+---
+
+🏬 Store API
+| Method | Endpoint       | Description     | Auth Required |
+| ------ | -------------- | --------------- | ------------- |
+| GET    | `/api/stores/` | List all stores | ✅ Yes         |
+| POST   | `/api/stores/` | Add a new store | ✅ Yes         |
+| ...    | etc.           |                 |               |
+
+---
+
+🛒 Cart Management (User)
+| Method | Endpoint                 | Description                        | Access |
+| ------ | ------------------------ | ---------------------------------- | ------ |
+| GET    | `/api/cart/`             | Get current user's cart            | ✅ Yes  |
+| POST   | `/api/cart/add/`         | Add item to cart                   | ✅ Yes  |
+| DELETE | `/api/cart/remove/<id>/` | Remove item from cart              | ✅ Yes  |
+| PUT    | `/api/cart/update/<id>/` | Update item quantity/customization | ✅ Yes  |
+
+---
+
+## 📝 Notes
 
 - Make sure to include `Authorization: Token <your_token>` in headers for authenticated endpoints.
 - All API docs are auto-generated using **drf-yasg** (Swagger for Django REST Framework).
+- Only authenticated users can interact with the Cake API.
+- Use TokenAuthentication to access secured endpoints.
+- Admin dashboard helps manage users, cakes, and store inventory.
+- Swagger and ReDoc docs are auto-generated using drf-yasg.
 
 ---

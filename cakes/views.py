@@ -13,13 +13,14 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .models import (
     Cake, Store, CartItem, Order, OrderItem, OrderStatusHistory, OrderAlert,
-    DeliveryAgent, CustomerProfile, Address
+    DeliveryAgent, CustomerProfile, Address, Review
 )
 from .serializers import (
     CakeSerializer, StoreSerializer, CartItemSerializer, OrderItemSerializer,
     OrderSerializer, OrderTrackingSerializer, OrderStatusHistorySerializer,
     OrderAlertSerializer, AgentSerializer, DeliveryAgentLocationSerializer,
-    UserRegistrationSerializer, CustomerProfileSerializer, AddressSerializer
+    UserRegistrationSerializer, CustomerProfileSerializer, AddressSerializer,
+    ReviewSerializer
 )
 
 
@@ -112,7 +113,30 @@ class CakeViewSet(viewsets.ModelViewSet):
     serializer_class = CakeSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    @action(detail=True, methods=['get'])
+    def reviews(self, request, pk=None):
+        cake = self.get_object()
+        reviews = cake.reviews.all()
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
 
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        # Automatically set the user to the authenticated user
+        serializer.save(user=self.request.user)
+    
+    # You can add a custom list method to filter by cake
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        cake_id = self.request.query_params.get('cake_id')
+        if cake_id:
+            queryset = queryset.filter(cake_id=cake_id)
+        return queryset
+    
 class StoreViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A ViewSet for listing or retrieving stores.

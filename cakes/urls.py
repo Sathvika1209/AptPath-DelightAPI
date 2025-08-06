@@ -4,7 +4,8 @@ from .views import (
     CakeViewSet, StoreViewSet, CartViewSet, OrderViewSet, AddressViewSet,
     DeliveryAgentViewSet, CustomerSignupView, LoginView, LogoutView,
     CustomerProfileView, UserView, DeleteAccountView, ChangePasswordView,
-    sales_analytics, top_selling_cakes, UpdateAgentLocationView
+    sales_analytics, top_selling_cakes, UpdateAgentLocationView,
+    ReviewViewSet, CategoryViewSet
 )
 from django.http import HttpResponse
 
@@ -21,6 +22,8 @@ router.register(r'cart', CartViewSet, basename='cart')
 router.register(r'orders', OrderViewSet, basename='order')
 router.register(r'addresses', AddressViewSet, basename='address')
 router.register(r'agents', DeliveryAgentViewSet, basename='agent')
+router.register(r'reviews', ReviewViewSet, basename='review')
+router.register(r'categories', CategoryViewSet, basename='category')
 
 # A simple home view for the root URL
 def index(request):

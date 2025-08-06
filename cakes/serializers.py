@@ -1,12 +1,27 @@
 # serializers.py
 from rest_framework import serializers
-from .models import Cake, Store, CartItem, Order, OrderItem, OrderStatusHistory, OrderAlert, DeliveryAgent, CustomerProfile, Address
+from .models import Cake, Store, CartItem, Order, OrderItem, OrderStatusHistory, OrderAlert, DeliveryAgent, CustomerProfile, Address, Review
 from django.contrib.auth.models import User
 
 class CakeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cake
         fields = '__all__'
+
+class CategorySerializer(serializers.ModelSerializer):
+    category_name = serializers.ReadOnlyField(source='category.name')
+    class Meta:
+        model = Cake
+        fields = ['id', 'name', 'flavor', 'size', 'price', 'category_name', 'category']
+        read_only_fields = ['category_name']
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = Review
+        fields = ['id', 'user', 'cake', 'rating', 'comment', 'created_at']
+        read_only_fields = ['user', 'created_at']
 
 class StoreSerializer(serializers.ModelSerializer):
     distance = serializers.FloatField(read_only=True, required=False)

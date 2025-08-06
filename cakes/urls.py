@@ -1,36 +1,50 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CakeViewSet, StoreViewSet, RegisterView, LoginView, LogoutView, UserView, DeleteAccountView, ChangePasswordView, UpdateProfileView, CartListView, AddToCartView, RemoveFromCartView, UpdateCartView, sales_analytics, top_selling_cakes, place_order, list_orders, order_detail, OrderViewSet
+from .views import (
+    CakeViewSet, StoreViewSet, CartViewSet, OrderViewSet, AddressViewSet,
+    DeliveryAgentViewSet, CustomerSignupView, LoginView, LogoutView,
+    CustomerProfileView, UserView, DeleteAccountView, ChangePasswordView,
+    sales_analytics, top_selling_cakes, UpdateAgentLocationView
+)
 from django.http import HttpResponse
 
+# A router automatically handles URL patterns for ViewSets
+# This creates URLs like:
+# /cakes/, /cakes/{pk}/
+# /stores/, /stores/{pk}/
+# /orders/, /orders/{pk}/, /orders/{pk}/cancel/, etc.
+# /addresses/, /addresses/{pk}/
 router = DefaultRouter()
-router.register(r'cakes', CakeViewSet)
-router.register(r'stores', StoreViewSet)
-router.register(r'orders', OrderViewSet, basename='orders')
+router.register(r'cakes', CakeViewSet, basename='cake')
+router.register(r'stores', StoreViewSet, basename='store')
+router.register(r'cart', CartViewSet, basename='cart')
+router.register(r'orders', OrderViewSet, basename='order')
+router.register(r'addresses', AddressViewSet, basename='address')
+router.register(r'agents', DeliveryAgentViewSet, basename='agent')
 
+# A simple home view for the root URL
 def index(request):
-    return HttpResponse("Welcome to DelightAPI")
+    return HttpResponse("<h1>Welcome to DelightAPI Backend!</h1><p>API endpoints are under /api/</p>")
 
 urlpatterns = [
-    path('', index, name='home'),  # homepage view
-    path('', include(router.urls)),  # DRF router endpoints like /cakes/
-    path('auth/register/', RegisterView.as_view(), name='register'),
-    path('auth/login/', LoginView.as_view(), name='login'),
-    path('auth/logout/', LogoutView.as_view(), name='logout'),
-    path('auth/user/', UserView.as_view(), name='user'),
-    path('auth/delete/', DeleteAccountView.as_view(), name='delete_account'),
-    path('auth/change-password/', ChangePasswordView.as_view(), name='change-password'),
-    path('auth/update/', UpdateProfileView.as_view(), name='update-profile'),
-    path('cart/', CartListView.as_view()),
-    path('cart/add/', AddToCartView.as_view()),
-    path('cart/remove/<int:id>/', RemoveFromCartView.as_view()),
-    path('cart/update/<int:id>/', UpdateCartView.as_view()),
-    path('analytics/sales/', sales_analytics, name='sales_analytics'),
-    path('analytics/top-cakes/', top_selling_cakes, name='top_selling_cakes'),
-    path('orders/', place_order, name='place_order'),
-    path('orders/', list_orders, name='list_orders'),
-    path('orders/<int:id>/', order_detail, name='order_detail'),
+    path('', index, name='home'),
+    
+    # All API endpoints are now under a single '/api/' prefix for clarity
+    path('api/', include(router.urls)),
+    
+    # --- Authentication & Profile URLs (APIViews, not ViewSets) ---
+    path('api/auth/register/', CustomerSignupView.as_view(), name='customer-signup'),
+    path('api/auth/login/', LoginView.as_view(), name='login'),
+    path('api/auth/logout/', LogoutView.as_view(), name='logout'),
+    path('api/auth/user/', UserView.as_view(), name='user'),
+    path('api/auth/profile/', CustomerProfileView.as_view(), name='customer-profile'),
+    path('api/auth/delete-account/', DeleteAccountView.as_view(), name='delete-account'),
+    path('api/auth/change-password/', ChangePasswordView.as_view(), name='change-password'),
 
+    # --- Analytics URLs (@api_view function-based views) ---
+    path('api/analytics/sales/', sales_analytics, name='sales-analytics'),
+    path('api/analytics/top-cakes/', top_selling_cakes, name='top-cakes'),
 
+    # --- Specific Agent Action ---
+    path('api/agents/<int:agent_id>/location-update/', UpdateAgentLocationView.as_view(), name='agent-location-update'),
 ]
-

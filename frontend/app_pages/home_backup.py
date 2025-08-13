@@ -295,33 +295,31 @@ def main_page():
     if current_page == 'home':
         home_page()
     elif current_page == 'stores':
-        stores.main_page()
+        stores.stores_page()
     elif current_page == 'cakes_catalog':
-        cakes_catalog.main_page()
+        cakes_catalog.cakes_catalog_page()
     elif current_page == 'cart':
-        cart.main_page()
+        cart.cart_page()
     elif current_page == 'customize':
-        customize.main_page()
+        customize.customize_page()
     elif current_page == 'dashboard':
-        dashboard.main_page()
+        dashboard.dashboard_page()
     elif current_page == 'map_demo':
         map_demo.map_demo_page()
     elif current_page == 'support':
         support.support_page()
     elif current_page == 'profile':
-        profile.main_page()
+        profile.profile_page()
     elif current_page == 'track':
-        track.main_page()
+        track.track_page()
     elif current_page == 'search':
-        search.main_page()
+        search.search_page()
     elif current_page == 'store_detail':
-        store_detail.main_page()
+        store_detail.store_detail_page()
     elif current_page == 'cake_detail':
-        cake_detail.main_page()
+        cake_detail.cake_detail_page()
     elif current_page == 'login':
         login.login_page()
-    '''elif current_page == 'profile':
-        profile.main_page()'''
     
     st.markdown("</div>", unsafe_allow_html=True)
     
@@ -331,7 +329,8 @@ def main_page():
         ("🔍", "Search", 'search'),
         ("🛒", "Cart", 'cart', 3),  # Number indicates badge count
     ]
-    
+    elif current_page == 'profile':
+        profile.main_page()
     st.markdown("<div class='bottom-nav'>", unsafe_allow_html=True)
     st.markdown("<div class='bottom-nav-container'>", unsafe_allow_html=True)
     

@@ -48,6 +48,17 @@ def main_page():
         is_vegan = st.checkbox("Vegan")
         
         notes = st.text_area("Additional notes or special requests")
+
+        # Live price preview
+        # Base price by servings, with minor add-ons for dietary options
+        base_price = 699 + max(0, (cake_size - 8)) * 50
+        addons = 0
+        if is_gluten_free:
+            addons += 60
+        if is_vegan:
+            addons += 90
+        est_price = base_price + addons
+        st.info(f"Estimated price: ₹{est_price}")
         submitted = st.form_submit_button("Add to Cart")
 
     if submitted:
@@ -56,9 +67,11 @@ def main_page():
             # Use a fixed product name for custom cakes and derive size label
             size_label = f"{cake_size} servings"
             custom_name = "Custom Cake"
-            # Price heuristic (you can refine): base by servings
+            # Price heuristic (same as preview)
             base_price = 699 + max(0, (cake_size - 8)) * 50
-            cake_id = ensure_custom_cake_id(custom_name, base_price, size_label, cake_flavor)
+            addons = (60 if is_gluten_free else 0) + (90 if is_vegan else 0)
+            final_price = base_price + addons
+            cake_id = ensure_custom_cake_id(custom_name, final_price, size_label, cake_flavor)
             if cake_id:
                 customization = "|".join([
                     f"store:{selected_store}",
@@ -80,11 +93,11 @@ def main_page():
                         st.balloons()
                         go_cols = st.columns(2)
                         with go_cols[0]:
-                            if st.button("Go to Cart"):
+                            if st.button("🛒\nGo to Cart"):
                                 st.session_state.page = 'cart'
                                 st.rerun()
                         with go_cols[1]:
-                            if st.button("Continue Browsing"):
+                            if st.button("🛍️\nContinue Browsing"):
                                 st.session_state.page = 'home'
                                 st.rerun()
                     else:

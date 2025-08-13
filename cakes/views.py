@@ -300,8 +300,8 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Order.objects.none()
         user = self.request.user
         if user.is_staff:
-            return Order.objects.all()
-        return Order.objects.filter(user=user)
+            return Order.objects.prefetch_related('items__cake').all()
+        return Order.objects.prefetch_related('items__cake').filter(user=user)
 
     def perform_create(self, serializer):
         # Fallback if someone uses default create; prefer create() override below
@@ -318,8 +318,40 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         # Create order and attach items
         order = Order.objects.create(user=user, status='confirmed')
+        def _parse_bool(val: str) -> bool:
+            return str(val).strip().lower() in ("1", "true", "yes", "y")
+
+        def _unit_price_for_cart_item(ci: CartItem):
+            try:
+                cust = ci.customization or ""
+                # Custom cake pricing heuristic
+                if ci.cake.name.lower().startswith('custom'):
+                    servings = 8
+                    gluten_free = False
+                    vegan = False
+                    for part in [p.strip() for p in cust.split('|') if p.strip()]:
+                        if part.startswith('size:'):
+                            lbl = part.split(':',1)[1].strip()
+                            if lbl.endswith('servings'):
+                                try:
+                                    servings = int(lbl.split()[0])
+                                except Exception:
+                                    servings = 8
+                        elif part.startswith('gluten_free:'):
+                            gluten_free = _parse_bool(part.split(':',1)[1])
+                        elif part.startswith('vegan:'):
+                            vegan = _parse_bool(part.split(':',1)[1])
+                    base = 699 + max(0, (servings - 8)) * 50
+                    addons = (60 if gluten_free else 0) + (90 if vegan else 0)
+                    return base + addons
+                # Default: use cake base price
+                return ci.cake.price
+            except Exception:
+                return ci.cake.price
+
         for ci in cart_qs:
-            OrderItem.objects.create(order=order, cake=ci.cake, quantity=ci.quantity, unit_price=ci.cake.price)
+            unit = _unit_price_for_cart_item(ci)
+            OrderItem.objects.create(order=order, cake=ci.cake, quantity=ci.quantity, unit_price=unit)
         # Clear cart
         cart_qs.delete()
 
@@ -329,6 +361,8 @@ class OrderViewSet(viewsets.ModelViewSet):
             order.agent = agent
             order.save()
 
+        # Reload with prefetched items to ensure nested data is present in response
+        order = Order.objects.prefetch_related('items__cake').get(pk=order.pk)
         serializer = OrderSerializer(order)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

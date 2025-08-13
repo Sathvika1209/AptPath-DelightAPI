@@ -104,7 +104,7 @@ def main_page():
                 # Count cakes available
                 available_cakes = [c for c in CAKES if store_id in c.get('stores', [])]
                 st.markdown(f"<small>Cakes available: <strong>{len(available_cakes)}</strong></small>", unsafe_allow_html=True)
-                if st.button("View catalog", key=f"open_store_detail_{store_id}"):
+                if st.button("🏪\nView Catalog", key=f"open_store_detail_{store_id}"):
                     st.session_state.store_id = store_id
                     # clear the cake filter once navigating into a store
                     if 'selected_cake_for_store' in st.session_state:

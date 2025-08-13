@@ -50,7 +50,7 @@ def main_page():
     for cake in filtered:
         with st.container(border=True):
             st.write(f"• {cake['name']}")
-            if st.button("View stores", key=f"viewstores_{cake['id']}"):
+            if st.button("🏪\nView Stores", key=f"viewstores_{cake['id']}"):
                 st.session_state.selected_cake_for_store = cake['id']
                 st.session_state.page = 'stores'
                 st.rerun()

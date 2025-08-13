@@ -1,9 +1,10 @@
 import base64
 import datetime
 import os
+import requests
 import streamlit as st
 from app_pages import customize, track, support, profile, cart, dashboard, map_demo, stores, cakes_catalog, cake_detail
-from app_pages.data import CAKES
+from app_pages.data import STORES, CAKES
 from app_pages import search, store_detail, login
 
 
@@ -162,13 +163,13 @@ def main_page():
             border-color: rgba(74, 144, 226, 0.4);
             color: #1f4e79;
         }}
-        stores.main_page()
+        .nav-icon {{
             font-size: 20px;
-        cakes_catalog.main_page()
+            margin-bottom: 4px;
         }}
-        cart.main_page()
+        
         /* Bottom Navigation Styling */
-        customize.main_page()
+        .bottom-nav {{
             position: fixed;
             bottom: 0;
             left: 0;
@@ -176,15 +177,15 @@ def main_page():
             z-index: 9999;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(15px);
-        profile.main_page()
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
             padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-        track.main_page()
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
         }}
-        search.main_page()
+        .bottom-nav-container {{
             display: flex;
-        store_detail.main_page()
+            justify-content: space-around;
             align-items: center;
-        cake_detail.main_page()
+            max-width: 400px;
             margin: 0 auto;
             padding: 0 20px;
         }}
@@ -271,14 +272,15 @@ def main_page():
             is_active = st.session_state.get('page') == page_key
             button_class = "nav-button active" if is_active else "nav-button"
             
-            # Only create invisible button for functionality (no display text)
-            if st.button("", key=f"nav_{page_key}", help=f"Go to {label}"):
+            # Create invisible button for functionality
+            if st.button(f"{icon}\n{label}", key=f"nav_{page_key}", 
+                        help=f"Go to {label}"):
                 st.session_state.page = page_key
                 st.rerun()
                 
-            # Display styled button with negative margin to overlay
+            # Display styled button
             st.markdown(f"""
-                <div class="{button_class}" style="margin-top: -38px; pointer-events: none;">
+                <div class="{button_class}">
                     <div class="nav-icon">{icon}</div>
                     <div>{label}</div>
                 </div>
@@ -329,39 +331,44 @@ def main_page():
         ("🔍", "Search", 'search'),
         ("🛒", "Cart", 'cart', 3),  # Number indicates badge count
     ]
-    elif current_page == 'profile':
-        profile.main_page()
+    
     st.markdown("<div class='bottom-nav'>", unsafe_allow_html=True)
     st.markdown("<div class='bottom-nav-container'>", unsafe_allow_html=True)
     
-    # Create bottom nav buttons with proper functionality
-    bottom_cols = st.columns(3)
-    for idx, item in enumerate(bottom_nav_items):
+    for item in bottom_nav_items:
         icon, label, page_key = item[:3]
         badge_count = item[3] if len(item) > 3 else None
         
-        with bottom_cols[idx]:
-            is_active = st.session_state.get('page') == page_key
-            button_class = "bottom-nav-button active" if is_active else "bottom-nav-button"
-            
-            # Create invisible button for functionality
-            if st.button("", key=f"bottom_{page_key}", help=f"Go to {label}"):
-                st.session_state.page = page_key
-                st.rerun()
-            
-            # Badge HTML
-            badge_html = f'<span class="nav-badge">{badge_count}</span>' if badge_count else ''
-            
-            # Display styled button with negative margin to overlay
-            st.markdown(f"""
-                <div class="{button_class}" style="margin-top: -38px; pointer-events: none;">
-                    <div class="bottom-nav-icon">{icon}</div>
-                    <div>{label}</div>
-                    {badge_html}
-                </div>
-            """, unsafe_allow_html=True)
+        is_active = st.session_state.get('page') == page_key
+        button_class = "bottom-nav-button active" if is_active else "bottom-nav-button"
+        
+        badge_html = f'<span class="nav-badge">{badge_count}</span>' if badge_count else ''
+        
+        # Create the button HTML (visual only)
+        st.markdown(f"""
+            <div class="{button_class}" onclick="window.parent.postMessage({{type: 'streamlit:setPageState', page: '{page_key}'}}, '*')">
+                <div class="bottom-nav-icon">{icon}</div>
+                <div>{label}</div>
+                {badge_html}
+            </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("</div></div>", unsafe_allow_html=True)
+    
+    # Handle bottom nav clicks with invisible buttons
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("", key="bottom_home", help="Home"):
+            st.session_state.page = 'home'
+            st.rerun()
+    with col2:
+        if st.button("", key="bottom_search", help="Search"):
+            st.session_state.page = 'search'
+            st.rerun()
+    with col3:
+        if st.button("", key="bottom_cart", help="Cart"):
+            st.session_state.page = 'cart'
+            st.rerun()
 
 
 if __name__ == "__main__":

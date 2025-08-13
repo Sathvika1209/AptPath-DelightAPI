@@ -27,24 +27,19 @@ def get_or_create_cake_id(name: str, price: float, size: str = "1 kg", flavor: s
 
 
 def ensure_custom_cake_id(name: str, price: float, size: str, flavor: str):
-    """Find or create a 'custom' cake variant on the backend.
-    Tries to match by name+size+flavor; creates if missing.
-    Returns PK or None on failure.
+    """Resolve a 'Custom Cake' on the backend without creating new records.
+    Returns the id of an existing cake whose name matches (case-insensitive).
+    If not found, returns None and shows a hint to seed one.
     """
     try:
         res = requests.get(f"{API_BASE_URL}/cakes/", headers=_headers())
         if res.status_code == 200:
             for c in res.json():
-                if c.get('name') == name and c.get('size') == size and c.get('flavor','').lower() == flavor.lower():
+                nm = str(c.get('name',''))
+                if nm.lower() == name.lower():
                     return c.get('id')
-        # Create
-        payload = {"name": name, "flavor": flavor, "size": size, "price": price}
-        cr = requests.post(f"{API_BASE_URL}/cakes/", headers=_headers(), json=payload)
-        if cr.status_code in (200, 201):
-            return cr.json().get('id')
-        else:
-            st.error(f"Could not create custom cake: {cr.status_code}")
-            return None
+        st.error("No 'Custom Cake' exists on backend. Please create one in admin or seed demo data.")
+        return None
     except Exception as e:
-        st.error(f"Error creating custom cake: {e}")
+        st.error(f"Error resolving custom cake: {e}")
         return None

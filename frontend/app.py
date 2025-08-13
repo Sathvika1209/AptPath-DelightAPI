@@ -70,11 +70,11 @@ st.markdown(f"""
     .stApp:before {{ /* subtle dark overlay for readability */
         content: '';
         position: absolute; inset:0;
-        background: rgba(0,0,0,0.25);
+        background: rgba(0,0,0,0.15);
         pointer-events:none;
     }}
     body.theme-dark .stApp:before {{
-        background: rgba(0,0,0,0.45);
+        background: rgba(0,0,0,0.35);
     }}
     /* Make the main block full-width with comfortable padding */
     .block-container {{

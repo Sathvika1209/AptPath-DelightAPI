@@ -100,7 +100,7 @@ def main_page():
         with col2:
             new_qty = st.number_input("Qty", min_value=1, value=quantity, key=f"qty_{item_id}")
             if new_qty != quantity:
-                if st.button("Update", key=f"update_{item_id}"):
+                if st.button("🔄\nUpdate", key=f"update_{item_id}"):
                     try:
                         update_res = requests.put(f"{API_BASE_URL}/cart/{item_id}/", headers=headers, json={"quantity": new_qty})
                         if update_res.status_code == 200:
@@ -113,7 +113,7 @@ def main_page():
         with col3:
             st.write(f"₹{price * quantity}")
         with col4:
-            if st.button("Remove", key=f"remove_{item_id}"):
+            if st.button("🗑️\nRemove", key=f"remove_{item_id}"):
                 try:
                     del_res = requests.delete(f"{API_BASE_URL}/cart/{item_id}/", headers=headers)
                     if del_res.status_code == 204:
@@ -138,7 +138,7 @@ def main_page():
         selected_addr_id = None
 
     # Checkout
-    if st.button("Proceed to Checkout"):
+    if st.button("💳\nProceed to Checkout"):
         if not selected_addr_id:
             st.error("Please select a delivery address.")
         else:
@@ -150,6 +150,9 @@ def main_page():
                     data = order_res.json() if order_res.content else {}
                     order_id = data.get('id')
                     st.success("Order placed! Redirecting to live tracking…")
+                    # Clear any cached cart data by removing session state
+                    if 'cart_items' in st.session_state:
+                        del st.session_state['cart_items']
                     if order_id:
                         st.session_state['track_order_id'] = order_id
                         st.session_state.page = 'map_demo'
@@ -157,6 +160,12 @@ def main_page():
                         st.session_state.page = 'dashboard'
                     st.rerun()
                 else:
-                    st.error("Failed to place order.")
+                    try:
+                        error_detail = order_res.json().get('detail', 'Unknown error')
+                    except:
+                        error_detail = order_res.text or f"HTTP {order_res.status_code}"
+                    st.error(f"Failed to place order: {error_detail}")
+            except requests.exceptions.ConnectionError:
+                st.error("Failed to place order: Cannot connect to server. Please ensure Django backend is running on http://127.0.0.1:8000")
             except Exception as e:
                 st.error(f"Error placing order: {e}")

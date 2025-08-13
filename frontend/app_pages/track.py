@@ -98,6 +98,15 @@ def main_page():
     ord_obj = next((o for o in orders if o['id'] == order_id), None)
     items = ord_obj.get('items', []) if ord_obj else []
     total = ord_obj.get('total_amount') if ord_obj else None
+    if (not items) or (not total or total <= 0):
+        try:
+            dres = requests.get(f"{API_BASE_URL}/orders/{order_id}/", headers=headers)
+            if dres.status_code == 200:
+                dd = dres.json()
+                items = dd.get('items', items)
+                total = dd.get('total_amount', total)
+        except Exception:
+            pass
     if total is None:
         try:
             total = sum(i.get('quantity',1) * (i.get('unit_price') or 100) for i in items)

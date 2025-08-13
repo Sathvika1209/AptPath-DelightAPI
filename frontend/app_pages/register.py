@@ -1,7 +1,6 @@
 # frontend/pages/register.py
 import streamlit as st
 import requests
-import json # You need this for pretty-printing the payload
 
 BASE_URL = "http://127.0.0.1:8000/api/auth"
 
@@ -60,15 +59,15 @@ def register_page():
                     }
                 }
 
-                # Optional: Display the payload for debugging
-                st.info("Sending the following JSON payload to the backend:")
-                st.json(data)
-
                 try:
                     res = requests.post(f"{BASE_URL}/register/", json=data)
                     if res.status_code == 200 or res.status_code == 201:
-                        st.success("🎉 Registered successfully! Please log in.")
-                        st.session_state["page"] = "login"
+                        st.success("🎉 Registration successful! Welcome to DelightAPI!")
+                        # Auto login the user and redirect to home
+                        st.session_state["logged_in"] = True
+                        st.session_state["username"] = username
+                        st.session_state["email"] = email
+                        st.session_state["page"] = "home"
                         st.rerun()
                     else:
                         st.error(f"❌ Registration failed: {res.json().get('error', res.text)}")

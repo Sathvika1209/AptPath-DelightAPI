@@ -155,11 +155,20 @@ SWAGGER_SETTINGS = {
 }
 
 # --- Email configuration ---
-# Use environment variables for real SMTP; falls back to console backend for dev.
-EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
-EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587') or 587)
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() == 'true'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'no-reply@delightapi.local')
+# Gmail SMTP configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'delightapi7@gmail.com'
+EMAIL_HOST_PASSWORD = 'kpsw tblj eggz hvtc'  # App password for Gmail
+DEFAULT_FROM_EMAIL = 'delightapi7@gmail.com'
+
+# Alternative: Use environment variables for production
+# EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+# EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+# EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587') or 587)
+# EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() == 'true'
+# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'delightapi7@gmail.com')
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'kpsw tblj eggz hvtc')
+# DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'delightapi7@gmail.com')

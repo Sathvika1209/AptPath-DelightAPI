@@ -89,14 +89,9 @@ def main_page():
                             return
                         resp = requests.post(f"{API_BASE_URL}/cart/", headers=headers, json=payload)
                         if resp.status_code in (200, 201):
-                            st.success("Added to cart")
-                            btnc = st.columns(2)
-                            with btnc[0]:
-                                if st.button("Go to Cart", key=f"go_cart_{sid}_{c['id']}"):
-                                    st.session_state.page = 'cart'
-                                    st.rerun()
-                            with btnc[1]:
-                                st.caption("Continue shopping…")
+                            # Set a flag to show success message and buttons
+                            st.session_state[f'cart_success_{sid}_{c["id"]}'] = True
+                            st.rerun()
                         else:
                             try:
                                 err = resp.json()
@@ -105,3 +100,22 @@ def main_page():
                             st.error(f"Failed to add to cart ({resp.status_code}). {err}")
                     except Exception as e:
                         st.error(f"Error: {e}")
+
+                # Show success message and buttons if cart addition was successful
+                success_key = f'cart_success_{sid}_{c["id"]}'
+                if st.session_state.get(success_key, False):
+                    st.success("Added to cart! ✅")
+                    btnc = st.columns(3)
+                    with btnc[0]:
+                        if st.button("🛒 Go to Cart", key=f"go_cart_{sid}_{c['id']}", type="primary"):
+                            # Clear the success flag and go to cart
+                            del st.session_state[success_key]
+                            st.session_state.page = 'cart'
+                            st.rerun()
+                    with btnc[1]:
+                        if st.button("🛍️ Continue Shopping", key=f"continue_{sid}_{c['id']}"):
+                            # Clear the success flag and stay on page
+                            del st.session_state[success_key]
+                            st.rerun()
+                    with btnc[2]:
+                        st.caption("Item added successfully!")

@@ -213,6 +213,86 @@ def main_page():
     API_BASE_URL = "http://127.0.0.1:8000/api"
     headers = {"Authorization": f"Token {st.session_state.get('token', '')}"}
 
+    # Analytics Section
+    st.subheader("🌟 Your Sweet Analytics")
+    
+    # Create metrics columns
+    metrics_cols = st.columns(4)
+    
+    # Mock analytics data (replace with real API calls)
+    total_orders = 24
+    total_spent = 12450
+    favorite_cake = "Chocolate Truffle"
+    loyalty_points = 340
+    
+    with metrics_cols[0]:
+        st.metric(
+            label="🛒 Total Orders", 
+            value=str(total_orders),
+            delta="2 this month"
+        )
+    
+    with metrics_cols[1]:
+        st.metric(
+            label="💰 Total Spent", 
+            value=f"₹{total_spent:,}",
+            delta="₹850 this month"
+        )
+    
+    with metrics_cols[2]:
+        st.metric(
+            label="🎂 Favorite Cake", 
+            value=favorite_cake
+        )
+    
+    with metrics_cols[3]:
+        st.metric(
+            label="⭐ Loyalty Points", 
+            value=str(loyalty_points),
+            delta="45 earned recently"
+        )
+
+    # Top Selling Cakes Chart
+    st.markdown("### 📈 Your Cake Preferences")
+    
+    # Create sample data for user's cake ordering history
+    cake_data = {
+        'Cake': ['Chocolate Truffle', 'Red Velvet', 'Black Forest', 'Vanilla', 'Strawberry', 'Butterscotch'],
+        'Orders': [8, 6, 4, 3, 2, 1]
+    }
+    
+    import pandas as pd
+    df = pd.DataFrame(cake_data)
+    
+    # Display as bar chart
+    st.bar_chart(df.set_index('Cake')['Orders'])
+    
+    # Monthly spending trend
+    st.markdown("### 💸 Monthly Spending Trend")
+    
+    spending_data = {
+        'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        'Amount': [800, 1200, 950, 1100, 1350, 850]
+    }
+    
+    df_spending = pd.DataFrame(spending_data)
+    st.line_chart(df_spending.set_index('Month')['Amount'])
+    
+    # Quick insights
+    st.markdown("### 💡 Quick Insights")
+    
+    insights_cols = st.columns(2)
+    
+    with insights_cols[0]:
+        st.info("🎯 You order most cakes on weekends! Perfect for celebrations.")
+        st.success("🏆 You're in the top 15% of our loyal customers!")
+    
+    with insights_cols[1]:
+        st.warning("📅 It's been 12 days since your last order. Missing something sweet?")
+        st.info("🎁 You're 160 points away from a free cake!")
+
+    st.markdown("---")
+
     # Fetch orders from backend
     try:
         res = requests.get(f"{API_BASE_URL}/orders/", headers=headers)
@@ -244,6 +324,16 @@ def main_page():
         agent = order.get('agent', None)
         items = order.get('items', [])
         price_sum = order.get('total_amount')
+        # If items or totals are missing, fetch the single order detail
+        if (not items) or (not price_sum or price_sum <= 0):
+            try:
+                dres = requests.get(f"{API_BASE_URL}/orders/{order_id}/", headers=headers)
+                if dres.status_code == 200:
+                    d = dres.json()
+                    items = d.get('items', items)
+                    price_sum = d.get('total_amount', price_sum)
+            except Exception:
+                pass
         if not price_sum or price_sum <= 0:
             try:
                 price_sum = sum((i.get('quantity',1) * (i.get('unit_price') or 0)) for i in items)
